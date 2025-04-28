@@ -2,6 +2,10 @@
 
 # Free MyBatis Tool Changelog
 
+## [2.2.3]
+- Enhanced the display of Mapper navigation: When multiple mapper files with the same name exist in different folders, the intelligent path comparison and color differentiation make navigation more intuitive and clear.（优化了Mapper跳转功能的显示效果，不同文件夹下有多个相同的mapper文件时，通过智能路径对比和颜色区分，让导航更直观清晰）
+
+
 ## [2.2.2]
 
 ### Fixed
