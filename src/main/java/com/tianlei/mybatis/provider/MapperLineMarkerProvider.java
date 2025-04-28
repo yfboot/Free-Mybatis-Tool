@@ -5,7 +5,7 @@ import com.google.common.collect.Collections2;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
-import com.intellij.ide.util.DefaultPsiElementCellRenderer;
+import com.intellij.ide.util.PsiElementListCellRenderer;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Collection;
 
 public class MapperLineMarkerProvider extends RelatedItemLineMarkerProvider {
@@ -43,14 +42,13 @@ public class MapperLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     .setTargets(Collections2.transform(results, FUN))
                     .setTooltipText("Navigate to Mapper XML")
                     .setPopupTitle("Select Target Mapper")
-                    .setCellRenderer(new MapperXmlRenderer());
+                    .setCellRenderer(new MapperCellRenderer());
                 result.add(builder.createLineMarkerInfo(((PsiNameIdentifierOwner) element).getNameIdentifier()));
             }
         }
     }
     
-    // 使用DefaultPsiElementCellRenderer作为基类以避免兼容性问题
-    private static class MapperXmlRenderer extends DefaultPsiElementCellRenderer {
+    private static class MapperCellRenderer extends PsiElementListCellRenderer<PsiElement> {
         @Override
         public String getElementText(PsiElement element) {
             try {
@@ -64,12 +62,12 @@ public class MapperLineMarkerProvider extends RelatedItemLineMarkerProvider {
             } catch (Exception e) {
                 LOGGER.warn("Error getting element text", e);
             }
-            return super.getElementText(element);
+            return element != null ? element.getText() : "Unknown";
         }
 
         @Nullable
         @Override
-        public String getContainerText(PsiElement element, String name) {
+        protected String getContainerText(PsiElement element, String name) {
             try {
                 // 显示文件路径
                 if (element instanceof XmlTag) {
@@ -94,6 +92,7 @@ public class MapperLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     // 安全获取文件路径
                     String relativePath = "";
                     VirtualFile virtualFile = xmlFile.getVirtualFile();
+
                     if (virtualFile != null) {
                         String virtualFilePath = virtualFile.getPath();
                         if (element.getProject() != null && element.getProject().getBasePath() != null) {
@@ -108,18 +107,12 @@ public class MapperLineMarkerProvider extends RelatedItemLineMarkerProvider {
                         }
                     }
                     
-                    return fileName + namespace + (relativePath.isEmpty() ? "" : " - " + relativePath);
+                    return   relativePath;
                 }
             } catch (Exception e) {
                 LOGGER.warn("Error getting container text", e);
             }
-            return super.getContainerText(element, name);
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            // 确保调用父类的渲染方法
-            return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            return null;
         }
 
         @Override
