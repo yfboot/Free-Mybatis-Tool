@@ -18,11 +18,6 @@ version = properties("pluginVersion").get()
 
 // Configure project's dependencies
 repositories {
-    maven("https://maven.aliyun.com/repository/public")
-    // 阿里云镜像（Google Android 相关库）
-    maven("https://maven.aliyun.com/repository/google")
-    // 阿里云镜像（Gradle 插件仓库）
-    maven("https://maven.aliyun.com/repository/gradle-plugin")
     mavenCentral()
 }
 
